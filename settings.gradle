@@ -1,0 +1,5 @@
+rootProject.name = 'hibernate-soft-delete'
+
+include 'api'
+include 'core'
+
