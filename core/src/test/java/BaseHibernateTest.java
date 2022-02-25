@@ -1,7 +1,4 @@
-import entity.Clinic;
-import entity.Owner;
-import entity.Pet;
-import entity.Visit;
+import entity.*;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.AfterEach;
@@ -17,7 +14,10 @@ public abstract class BaseHibernateTest {
         configuration.addAnnotatedClass(Pet.class)
                 .addAnnotatedClass(Owner.class)
                 .addAnnotatedClass(Clinic.class)
-                .addAnnotatedClass(Visit.class);
+                .addAnnotatedClass(Visit.class)
+                .addAnnotatedClass(BaseEntity.class)
+                .addAnnotatedClass(ExtendedEntity.class)
+        ;
         configuration.setProperty("hibernate.dialect",
                 "org.hibernate.dialect.H2Dialect");
         configuration.setProperty("hibernate.connection.driver_class",

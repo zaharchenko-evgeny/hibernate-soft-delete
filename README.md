@@ -46,7 +46,9 @@ Soft deleted column supported following column types:
 - Integer - 1 if entity was soft deleted
 - String - 'deleted' is entity was soft deleted
 
-This library is tested with Hibernate 5.5.x
+If an entity annotated with `@SoftDeleted` it is equal that entity has `SQLDelete(sql='UPDATE <entity_table> SET <soft delete column> = true WHERE <entity id> = ?')` 
+and `@Where(clause='<soft delete column> is null')` Hibernate annotations
 
-_Currently still under development_
+This library is tested with Hibernate 5.6.x
+
 

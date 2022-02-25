@@ -15,6 +15,7 @@ import javax.persistence.ManyToMany;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -39,32 +40,15 @@ public class SoftDeleteHibernateMetadataIntegrator implements Integrator {
     private void applySoftDeletion(Metadata metadata, SoftDeleteConditions softDeleteConditions) {
         for (PersistentClass entityBinding : metadata.getEntityBindings()) {
             if (isSoftDeletable(entityBinding)) {
+                applySoftDeletion(metadata, entityBinding, softDeleteConditions);
                 if (entityBinding instanceof RootClass) {
-                    applySoftDeletion(metadata, (RootClass) entityBinding, softDeleteConditions);
+                    applyWhere((RootClass) entityBinding, softDeleteConditions);
                 } else {
-                    Class<?> mappedClass = entityBinding.getMappedClass();
-                    Field deletedDateProperty = findDeletedDateProperty(mappedClass);
-                    if (isOwnProperty(mappedClass, deletedDateProperty)) {
-//                        throw new IllegalStateException(format(
-//                                "Soft deletion property '%s' is not supported on inherited classes (class: %s)",
-//                                deletedDateProperty,
-//                                mappedClass.getName())
-//                        );
-                    }
+                    log.warning(String.format("@Where condition was not applied to inherited entity %s",entityBinding.getClassName()));
                 }
             }
             applySoftDeletionFilterForLinkedEntities(metadata, entityBinding, softDeleteConditions);
         }
-    }
-
-    private boolean isOwnProperty(Class<?> mappedClass, Field deletedField) {
-        return Stream.of(mappedClass.getDeclaredFields()).anyMatch(f -> f == deletedField);
-    }
-
-    private Field findDeletedDateProperty(Class<?> mappedClass) {
-        return Stream.of(mappedClass.getDeclaredFields())
-                .filter(f -> f.getAnnotation(SoftDeleteColumn.class) != null)
-                .findFirst().orElse(null);
     }
 
     private void applySoftDeletionFilterForLinkedEntities(Metadata metadata, PersistentClass entityBinding, SoftDeleteConditions softDeleteConditions) {
@@ -155,13 +139,12 @@ public class SoftDeleteHibernateMetadataIntegrator implements Integrator {
         }
     }
 
-    private void applySoftDeletion(Metadata metadata, RootClass entityBinding, SoftDeleteConditions softDeleteConditions) {
+    private void applySoftDeletion(Metadata metadata, PersistentClass entityBinding, SoftDeleteConditions softDeleteConditions) {
         addSoftDeletedColumn(metadata, entityBinding, softDeleteConditions);
-        applyWhere(entityBinding, softDeleteConditions);
         applySQLDelete(entityBinding, softDeleteConditions);
     }
 
-    private void addSoftDeletedColumn(Metadata metadata, RootClass entityBinding, SoftDeleteConditions softDeleteConditions) {
+    private void addSoftDeletedColumn(Metadata metadata, PersistentClass entityBinding, SoftDeleteConditions softDeleteConditions) {
         SoftDelete softDelete = (SoftDelete) entityBinding.getMappedClass().getAnnotation(SoftDelete.class);
         if (!softDelete.property().isEmpty()) {
             if (entityBinding.hasProperty(softDelete.property())) {
@@ -192,7 +175,7 @@ public class SoftDeleteHibernateMetadataIntegrator implements Integrator {
         }
     }
 
-    private void applySQLDelete(RootClass entityBinding, SoftDeleteConditions softDeleteConditions) {
+    private void applySQLDelete(PersistentClass entityBinding, SoftDeleteConditions softDeleteConditions) {
         if (entityBinding.getCustomSQLDelete() == null) {
             String tableName = entityBinding.getTable().getName();
             String softDeleteSetter = softDeleteConditions.getSQLDeleteSetter(entityBinding);
@@ -204,7 +187,7 @@ public class SoftDeleteHibernateMetadataIntegrator implements Integrator {
         }
     }
 
-    private String findIdColumn(RootClass entityBinding) {
+    private String findIdColumn(PersistentClass entityBinding) {
         Column column = (Column) entityBinding.getIdentifierProperty().getColumnIterator().next();
         return column.getName();
     }

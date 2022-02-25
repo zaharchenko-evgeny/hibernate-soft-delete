@@ -18,10 +18,6 @@ public class ManyToManyTest extends BaseHibernateTest {
 
     @Test
     public void manyToMany() {
-        CriteriaBuilder criteriaBuilder = new CriteriaBuilderImpl((SessionFactoryImpl) sessionFactory);
-        CriteriaQuery<Clinic> clinicCriteriaQuery = criteriaBuilder.createQuery(Clinic.class);
-        CriteriaQuery<Clinic> appClinicCriteriaQuery = clinicCriteriaQuery.select(clinicCriteriaQuery.from(Clinic.class));
-
         Transaction tx = null;
         try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
