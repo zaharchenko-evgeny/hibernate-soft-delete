@@ -1,7 +1,7 @@
 package entity;
 
-import ru.zaharchenko.hibernate.softdelete.core.api.SoftDelete;
-import ru.zaharchenko.hibernate.softdelete.core.api.SoftDeleteColumn;
+import io.github.zaharchenko.hibernate.softdelete.core.api.SoftDelete;
+import io.github.zaharchenko.hibernate.softdelete.core.api.SoftDeleteColumn;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

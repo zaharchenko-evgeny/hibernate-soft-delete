@@ -1,4 +1,4 @@
-package ru.zaharchenko.hibernate.softdelete.core.conditions;
+package io.github.zaharchenko.hibernate.softdelete.core.conditions;
 
 import org.hibernate.mapping.Column;
 
@@ -15,6 +15,7 @@ public interface SoftDeleteCondition {
      *
      * @param column Hibernate column mapping
      * @param nullable column is nullable or not
+     * @return SQL where soft delete condition for given column
      */
     String sqlWhere(Column column, boolean nullable);
 
@@ -23,6 +24,7 @@ public interface SoftDeleteCondition {
      *
      * @param column Hibernate column mapping
      * @param nullable column is nullable or not
+     * @return SQL set expression for given column
      */
     String sqlDeleteSetter(Column column, boolean nullable);
 }

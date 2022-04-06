@@ -1,10 +1,10 @@
-package ru.zaharchenko.hibernate.softdelete.core;
+package io.github.zaharchenko.hibernate.softdelete.core;
 
+import io.github.zaharchenko.hibernate.softdelete.core.conditions.*;
 import org.hibernate.mapping.*;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
-import ru.zaharchenko.hibernate.softdelete.core.api.SoftDelete;
-import ru.zaharchenko.hibernate.softdelete.core.api.SoftDeleteColumn;
-import ru.zaharchenko.hibernate.softdelete.core.conditions.*;
+import io.github.zaharchenko.hibernate.softdelete.core.api.SoftDelete;
+import io.github.zaharchenko.hibernate.softdelete.core.api.SoftDeleteColumn;
 
 import java.util.AbstractMap;
 import java.util.Date;
@@ -87,8 +87,7 @@ public class SoftDeleteConditions {
         if (value instanceof SimpleValue) {
             SimpleValue simpleValue = (SimpleValue) value;
             if (simpleValue.getColumnIterator().hasNext()) {
-                Column column = (Column) simpleValue.getColumnIterator().next();
-                return column;
+                return (Column) simpleValue.getColumnIterator().next();
             }
         } else {
             throw new IllegalStateException(format(

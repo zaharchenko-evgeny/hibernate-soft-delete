@@ -1,4 +1,4 @@
-package ru.zaharchenko.hibernate.softdelete.core.api;
+package io.github.zaharchenko.hibernate.softdelete.core.api;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

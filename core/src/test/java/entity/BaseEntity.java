@@ -1,7 +1,5 @@
 package entity;
 
-import ru.zaharchenko.hibernate.softdelete.core.api.SoftDelete;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 

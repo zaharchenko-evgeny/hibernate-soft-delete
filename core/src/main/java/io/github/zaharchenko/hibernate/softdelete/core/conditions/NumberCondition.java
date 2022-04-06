@@ -1,4 +1,4 @@
-package ru.zaharchenko.hibernate.softdelete.core.conditions;
+package io.github.zaharchenko.hibernate.softdelete.core.conditions;
 
 import org.hibernate.mapping.Column;
 

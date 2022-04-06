@@ -1,9 +1,11 @@
-group 'ru.zaharchenko.hibernate'
-version '0.0.1-SNAPSHOT'
+group 'io.github.zaharchenko-evgeny'
+version hasProperty('buildVersion')?property('buildVersion'):'0.0.1-SNAPSHOT'
 
 subprojects {
+
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
+    apply plugin: 'signing'
 
     repositories {
         mavenCentral()
@@ -20,29 +22,69 @@ subprojects {
     sourceCompatibility = '1.8'
 
     java {
+        withJavadocJar()
         withSourcesJar()
     }
 
-    artifacts {
-        archives sourcesJar
-    }
-
     publishing {
-        repositories {
-            maven {
-                url = 'https://myrepo/releases/'
-                credentials {
-                    username rootProject.hasProperty('uploadUser') ? rootProject['uploadUser'] : 'admin'
-                    password rootProject.hasProperty('uploadPassword') ? rootProject['uploadPassword'] : 'admin'
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                versionMapping {
+                    usage('java-api') {
+                        fromResolutionOf('runtimeClasspath')
+                    }
+                    usage('java-runtime') {
+                        fromResolutionResult()
+                    }
                 }
-                allowInsecureProtocol = true
+                pom {
+                    name = 'Hibernate soft deletion'
+                    description='Hibernate plugin provides soft deletion functionality via annotations'
+                    url='https://github.com/zaharchenko-evgeny/hibernate-soft-delete'
+
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id='zaharchenko-evgeny'
+                            name='Evgeny Zakharchenko'
+                            email='udjin0314@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:git@github.com:zaharchenko-evgeny/hibernate-soft-delete.git'
+                        url = 'https://github.com/zaharchenko-evgeny/hibernate-soft-delete'
+                    }
+                }
             }
         }
-        publications {
-            javaMaven(MavenPublication) {
-                artifactId = archName
-                from components.java
+        repositories {
+            maven {
+                // change URLs to point to your repos, e.g. http://my.org/repo
+                def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                credentials {
+                    username ossrhUsername
+                    password ossrhPassword
+                }
             }
+        }
+    }
+
+    signing {
+        sign publishing.publications.mavenJava
+    }
+
+
+    javadoc {
+        if (JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
         }
     }
 }

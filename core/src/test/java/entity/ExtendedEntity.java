@@ -1,8 +1,8 @@
 package entity;
 
 import org.hibernate.annotations.Where;
-import ru.zaharchenko.hibernate.softdelete.core.api.SoftDelete;
-import ru.zaharchenko.hibernate.softdelete.core.api.SoftDeleteColumn;
+import io.github.zaharchenko.hibernate.softdelete.core.api.SoftDelete;
+import io.github.zaharchenko.hibernate.softdelete.core.api.SoftDeleteColumn;
 
 import javax.persistence.Entity;
 import java.util.Date;

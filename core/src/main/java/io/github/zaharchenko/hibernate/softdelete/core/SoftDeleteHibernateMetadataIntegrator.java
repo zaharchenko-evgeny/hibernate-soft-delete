@@ -1,4 +1,4 @@
-package ru.zaharchenko.hibernate.softdelete.core;
+package io.github.zaharchenko.hibernate.softdelete.core;
 
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.MetadataImplementor;
@@ -8,15 +8,11 @@ import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.mapping.*;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.hibernate.type.Type;
-import ru.zaharchenko.hibernate.softdelete.core.api.SoftDelete;
-import ru.zaharchenko.hibernate.softdelete.core.api.SoftDeleteColumn;
+import io.github.zaharchenko.hibernate.softdelete.core.api.SoftDelete;
 
 import javax.persistence.ManyToMany;
-import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.lang.String.format;
 
@@ -55,31 +51,27 @@ public class SoftDeleteHibernateMetadataIntegrator implements Integrator {
         for (Iterator it = entityBinding.getPropertyIterator(); it.hasNext(); ) {
             Property property = (Property) it.next();
             Type propertyType = property.getType();
-            if (propertyType.isCollectionType()) {
-                if (property.getValue() instanceof Bag) {
-                    Bag bag = (Bag) property.getValue();
-                    PersistentClass propertyClass = getPropertyClass(bag.getElement(), metadata);
-                    if (propertyClass != null && isSoftDeletable(propertyClass)) {
-                        String where = softDeleteConditions.getSoftDeleteWhere(propertyClass);
-                        if (where != null) {
-                            if (isManyToMany(property)) {
-                                applyIgnoreNotFound(bag);
-                                addManyToManyWhereCondition(bag, where);
-                            } else {
-                                addWhereCondition(bag, where);
-                            }
+            if (propertyType.isCollectionType() && property.getValue() instanceof Bag) {
+                Bag bag = (Bag) property.getValue();
+                PersistentClass propertyClass = getPropertyClass(bag.getElement(), metadata);
+                if (propertyClass != null && isSoftDeletable(propertyClass)) {
+                    String where = softDeleteConditions.getSoftDeleteWhere(propertyClass);
+                    if (where != null) {
+                        if (isManyToMany(property)) {
+                            applyIgnoreNotFound(bag);
+                            addManyToManyWhereCondition(bag, where);
+                        } else {
+                            addWhereCondition(bag, where);
                         }
                     }
-
                 }
+
             }
             if (propertyType.isAssociationType() && !propertyType.isCollectionType()) {
                 PersistentClass propertyClass = getPropertyClass(property.getValue(), metadata);
-                if (propertyClass != null && isSoftDeletable(propertyClass)) {
-                    if (property.getValue() instanceof ManyToOne) {
-                        ManyToOne manyToOne = (ManyToOne) property.getValue();
-                        manyToOne.setIgnoreNotFound(true);
-                    }
+                if (propertyClass != null && isSoftDeletable(propertyClass) && property.getValue() instanceof ManyToOne) {
+                    ManyToOne manyToOne = (ManyToOne) property.getValue();
+                    manyToOne.setIgnoreNotFound(true);
                 }
             }
         }
